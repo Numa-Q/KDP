@@ -466,7 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             modal.style.display = 'none';
                             showToast('success', 'Page supprimée !');
                             console.log(`Page ${index + 1} supprimée`);
-                        });
+                        };
                     });
 
                     // Glisser-déposer
