@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Template changed:', pageTemplate.value);
         });
 
-        // Glisser-d
+        // Glisser-déposer
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropZone.classList.add('dragover');
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         imageUpload.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 console.log('Image selected:', e.target.files[0].name);
-                handleImage(e.target[0].files);
+                handleImage(e.target.files[0]);
             }
         });
 
@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const blob = new Blob([json], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url);
+            a.href = url;
             a.download = `${config.fileName}.json`;
             a.click();
             URL.revokeObjectURL(url);
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) => {
+            reader.onload = (e) => {
                 try {
                     const project = JSON.parse(e.target.result);
                     if (!project.config || !Array.isArray(project.pages)) {
@@ -255,10 +255,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     bgColorInput.value = project.config.bgColor || '#FFFFFF';
                     fontSelect.value = project.config.font || 'Arial';
                     textColorInput.value = project.config.textColor || '#000000';
-                    pages = project.pages.filter(page => p pageage.image && page.template);
+                    pages = project.pages.filter(page => page.image && page.template);
                     updateCarousel();
                     saveConfig();
-                    showToast('success', 'Projet chargé avec succés !');
+                    showToast('success', 'Projet chargé avec succès !');
                     console.log('Project loaded:', project.config.fileName);
                 } catch (error) {
                     console.error('Load file error:', error);
