@@ -356,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 toast.classList.remove('active');
                 setTimeout(() => {
-                    toast.style.display = 'none';
+                    toast.style.display = 'none');
                 }, 300);
             }, 3000);
         }
@@ -462,7 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         showModal(`Supprimer la page ${index + 1} ?`, true);
                         modalConfirm.onclick = () => {
                             pages.splice(index, 1);
-                            updateCarousel();
                             modal.style.display = 'none';
                             showToast('success', 'Page supprimée !');
                             console.log(`Page ${index + 1} supprimée`);
@@ -509,4 +508,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Initialization error:', error);
         alert('Erreur lors de l’initialisation. Vérifiez la console.');
     }
-});
+});15
