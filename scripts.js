@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const pageSizeSelect = document.getElementById('page-size');
         const bgColorInput = document.getElementById('bg-color');
         const fontSelect = document.getElementById('font');
+        const fontSizeInput = document.getElementById('font-size');
         const textColorInput = document.getElementById('text-color');
 
         // Vérifications DOM
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modal, modalMessage, modalConfirm, modalClose, toast,
             saveProjectButton, loadProjectButton, loadFileInput, exportPDFButton,
             clearProjectButton, bookTitleInput, fileNameInput, pageSizeSelect,
-            bgColorInput, fontSelect, textColorInput
+            bgColorInput, fontSelect, fontSizeInput, textColorInput
         };
         for (const [key, element] of Object.entries(requiredElements)) {
             if (!element) {
@@ -109,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 pageSize: pageSizeSelect.value,
                 bgColor: bgColorInput.value,
                 font: fontSelect.value,
+                fontSize: fontSizeInput.value,
                 textColor: textColorInput.value
             };
             localStorage.setItem('lastConfig', JSON.stringify(config));
@@ -124,13 +126,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 pageSizeSelect.value = config.pageSize || 'a4';
                 bgColorInput.value = config.bgColor || '#FFFFFF';
                 fontSelect.value = config.font || 'Arial';
+                fontSizeInput.value = config.fontSize || '12';
                 textColorInput.value = config.textColor || '#000000';
                 console.log('Configuration loaded:', config);
             }
         }
 
         loadConfig();
-        [bookTitleInput, fileNameInput, pageSizeSelect, bgColorInput, fontSelect, textColorInput].forEach(input => {
+        [bookTitleInput, fileNameInput, pageSizeSelect, bgColorInput, fontSelect, fontSizeInput, textColorInput].forEach(input => {
             input.addEventListener('change', saveConfig);
         });
 
@@ -142,6 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (!fileNameInput.value.match(/^[a-zA-Z0-9_-]+$/)) {
                 showToast('error', 'Nom de fichier invalide (lettres, chiffres, tirets, underscores).');
+                return false;
+            }
+            const fontSize = parseInt(fontSizeInput.value);
+            if (fontSize < 8 || fontSize > 24) {
+                showToast('error', 'La taille de police doit être entre 8 et 24.');
                 return false;
             }
             return true;
@@ -218,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 pageSize: pageSizeSelect.value,
                 bgColor: bgColorInput.value,
                 font: fontSelect.value,
+                fontSize: fontSizeInput.value,
                 textColor: textColorInput.value
             };
             const project = { config, pages };
@@ -254,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     pageSizeSelect.value = project.config.pageSize || 'a4';
                     bgColorInput.value = project.config.bgColor || '#FFFFFF';
                     fontSelect.value = project.config.font || 'Arial';
+                    fontSizeInput.value = project.config.fontSize || '12';
                     textColorInput.value = project.config.textColor || '#000000';
                     pages = project.pages.filter(page => page.image && page.template);
                     updateCarousel();
@@ -288,17 +298,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 '8.5x11': [8.5, 11]
             };
             const [width, height] = sizes[pageSizeSelect.value] || sizes['a4'];
+            const margin = 0.5; // Marge en pouces
+
+            // Mapper les polices pour compatibilité jsPDF
+            const fontMap = {
+                'Roboto': 'Helvetica',
+                'Arial': 'Helvetica',
+                'Times New Roman': 'Times'
+            };
+
             pages.forEach((page, index) => {
                 if (index > 0) doc.addPage();
                 doc.setFillColor(bgColorInput.value);
                 doc.rect(0, 0, width, height, 'F');
-                doc.addImage(page.image, 'JPEG', 0, 0, width, height, undefined, 'FAST');
+
+                let imgWidth = width - 2 * margin;
+                let imgHeight = height - 2 * margin;
+                let imgX = margin;
+                let imgY = margin;
+                let textY;
+
+                if (page.template === 'portrait-text') {
+                    imgHeight = height * 0.7; // 70% pour l'image
+                    textY = imgHeight + margin + 0.5; // Texte en bas
+                } else if (page.template === 'landscape-text') {
+                    imgHeight = height * 0.6; // 60% pour l'image
+                    imgY = height - imgHeight - margin; // Image en bas
+                    textY = margin + 0.5; // Texte en haut
+                }
+
+                doc.addImage(page.image, 'JPEG', imgX, imgY, imgWidth, imgHeight, undefined, 'FAST');
+
                 if (page.template !== 'full-page' && page.prompt) {
-                    doc.setFont(fontSelect.value);
+                    const selectedFont = fontSelect.value;
+                    const pdfFont = fontMap[selectedFont] || 'Helvetica';
+                    doc.setFont(pdfFont);
                     doc.setTextColor(textColorInput.value);
-                    doc.setFontSize(12);
-                    const textY = page.template === 'portrait-text' ? height - 2 : 1;
-                    doc.text(page.prompt, 0.5, textY, { maxWidth: width - 1 });
+                    const fontSize = parseInt(fontSizeInput.value) || 12;
+                    doc.setFontSize(fontSize);
+                    doc.text(page.prompt, margin, textY, { maxWidth: width - 2 * margin });
+                    if (selectedFont !== pdfFont) {
+                        showToast('warning', `Police ${selectedFont} non disponible, utilisation de ${pdfFont}.`);
+                    }
                 }
             });
             const fileName = fileNameInput.value || 'livre_sans_titre';
@@ -317,6 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 pageSizeSelect.value = 'a4';
                 bgColorInput.value = '#FFFFFF';
                 fontSelect.value = 'Arial';
+                fontSizeInput.value = '12';
                 textColorInput.value = '#000000';
                 pageTemplate.value = 'full-page';
                 imagePrompt.value = '';
@@ -356,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 toast.classList.remove('active');
                 setTimeout(() => {
-                    toast.style.display = 'none');
+                    toast.style.display = 'none';
                 }, 300);
             }, 3000);
         }
@@ -462,6 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         showModal(`Supprimer la page ${index + 1} ?`, true);
                         modalConfirm.onclick = () => {
                             pages.splice(index, 1);
+                            updateCarousel();
                             modal.style.display = 'none';
                             showToast('success', 'Page supprimée !');
                             console.log(`Page ${index + 1} supprimée`);
@@ -508,4 +551,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Initialization error:', error);
         alert('Erreur lors de l’initialisation. Vérifiez la console.');
     }
-});15
+});
