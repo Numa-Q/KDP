@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDP Creator</title>
+    <!-- Base pour chemins relatifs -->
+    <base href="./">
+    <!-- Feuille de style -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- jsPDF pour export PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body data-theme="dark" class="initial-dark">
+    <header class="title-bar">
+        <h1>KDP Creator</h1>
+        <div class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle" class="slider"></label>
+        </div>
+    </header>
+    <div class="main-container">
+        <!-- Panneau de gauche : Configuration -->
+        <div class="panel" id="config-panel">
+            <h2>Configuration du Livre</h2>
+            <div class="config-field">
+                <label for="book-title">Titre du Livre</label>
+                <input type="text" id="book-title" placeholder="Mon Nouveau Livre KDP" required>
+            </div>
+            <div class="config-field">
+                <label for="file-name">Nom du fichier export</label>
+                <input type="text" id="file-name" placeholder="mon-nouveau-livre-kdp" pattern="[a-zA-Z0-9_-]+" title="Lettres, chiffres, tirets ou underscores uniquement">
+            </div>
+            <div class="config-field">
+                <label for="page-size">Taille de Page KDP</label>
+                <select id="page-size">
+                    <option value="a4">A4</option>
+                    <option value="a5">A5</option>
+                    <option value="6x9">6x9 pouces</option>
+                    <option value="8.5x11">8.5x11 pouces</option>
+                </select>
+            </div>
+            <div class="config-field">
+                <label for="bg-color">Couleur de Fond</label>
+                <input type="color" id="bg-color" value="#FFFFFF">
+            </div>
+            <div class="config-field">
+                <label for="font">Police d'Écriture</label>
+                <select id="font">
+                    <option value="Roboto">Roboto</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                </select>
+            </div>
+            <div class="config-field">
+                <label for="text-color">Couleur du Texte</label>
+                <input type="color" id="text-color" value="#000000">
+            </div>
+        </div>
+        <!-- Section centrale : Gestion des pages -->
+        <div class="center-panel" id="pages-panel">
+            <div class="carousel-section">
+                <h2>Pages du Livre</h2>
+                <div class="carousel" id="page-carousel">
+                    <!-- Miniatures ou page vide ajoutées dynamiquement -->
+                </div>
+            </div>
+            <div class="add-page-section">
+                <h2>Ajouter une Page</h2>
+                <div class="add-page-container">
+                    <div class="drop-preview-zone">
+                        <div class="drop-zone" id="drop-zone">
+                            <p>Glissez-déposez une image ici ou cliquez pour charger</p>
+                            <input type="file" id="image-upload" accept="image/*">
+                        </div>
+                        <div class="preview-zone" id="preview-zone">
+                            <p>Aucune image sélectionnée</p>
+                        </div>
+                    </div>
+                    <div class="page-options">
+                        <div class="config-field">
+                            <label for="page-template">Modèle de Page</label>
+                            <select id="page-template">
+                                <option value="full-page">Pleine Page</option>
+                                <option value="portrait-text">Portrait + Texte</option>
+                                <option value="landscape-text">Paysage + Texte</option>
+                            </select>
+                        </div>
+                        <div class="config-field" id="prompt-field" style="display: none;">
+                            <label for="image-prompt">Prompt de l'image</label>
+                            <textarea id="image-prompt" placeholder="Entrez le prompt de l'image"></textarea>
+                        </div>
+                        <div class="button-group">
+                            <button id="add-page" disabled>Ajouter la Page</button>
+                            <button id="clear-preview">Annuler</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Panneau de droite : Sauvegarde & Exportation -->
+        <div class="panel" id="export-panel">
+            <h2>Sauvegarde & Exportation</h2>
+            <button id="save-project">Sauvegarder le Projet (.JSON)</button>
+            <button id="load-project">Charger un Projet</button>
+            <input type="file" id="load-file" accept=".json" style="display: none;">
+            <button id="export-pdf">Exporter en PDF</button>
+            <button id="clear-project" class="clear-button">Effacer le Projet</button>
+        </div>
+    </div>
+    <!-- Modale -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <p id="modal-message"></p>
+            <div class="modal-buttons">
+                <button id="modal-confirm">Confirmer</button>
+                <button id="modal-close">Annuler</button>
+            </div>
+        </div>
+    </div>
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    <script src="scripts.js"></script>
+</body>
+</html>
