@@ -80,14 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let isToastActive = false;
 
     // Mode sombre/clair
-    let savedTheme = localStorage.getItem('theme');
-    if (!savedTheme) {
-      savedTheme = 'dark'; // Forcer le mode sombre par défaut
-      localStorage.setItem('theme', savedTheme);
-    }
-    console.log('Initial theme:', savedTheme);
+    let savedTheme = 'dark'; // Forcer mode sombre par défaut
+    localStorage.setItem('theme', savedTheme); // Réinitialiser à chaque chargement
+    console.log('Initial theme forced:', savedTheme);
     body.setAttribute('data-theme', savedTheme);
-    themeToggle.checked = savedTheme === 'light';
+    themeToggle.checked = false; // Non coché pour mode sombre
     body.classList.remove('initial-dark');
 
     themeToggle.addEventListener('change', () => {
@@ -102,6 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('error', 'Erreur lors du changement de thème.');
       }
     });
+
+    // Forcer la modale à être cachée au chargement
+    modal.style.display = 'none';
+    console.log('Modal initialized: hidden');
 
     // Validation du contraste WCAG
     function calculateContrast(bgColor, textColor) {
@@ -368,13 +369,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (page.template !== 'full-page' && page.prompt) {
           const selectedFont = fontSelect.value;
           const pdfFont = fontMap[selectedFont] || 'Helvetica';
+          console.log('Font mapping:', { selectedFont, pdfFont });
           doc.setFont(pdfFont);
           doc.setTextColor(textColorInput.value);
           const fontSize = parseInt(fontSizeInput.value) || 12;
           doc.setFontSize(fontSize);
           doc.text(page.prompt, margin, textY, { maxWidth: width - 2 * margin });
           if (selectedFont !== pdfFont) {
-            showToast('warning', `Police ${selectedFont} non disponible, utilisation de ${pdfFont}.`);
+            showToast('info', `Police "${selectedFont}" non disponible dans PDF, "${pdfFont}" utilisé.`);
           }
         }
       });
@@ -386,6 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Effacer projet
     clearProjectButton.addEventListener('click', () => {
+      console.log('Clear project button clicked');
       showModal('Effacer tout le projet ?', true);
       modalConfirm.onclick = () => {
         pages = [];
@@ -410,10 +413,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Afficher modale
     function showModal(message, showConfirm = false) {
+      console.log('showModal called:', { message, showConfirm });
       modalMessage.textContent = message;
       modalConfirm.style.display = showConfirm ? 'inline-block' : 'none';
       modal.style.display = 'block';
-      console.log('Modal shown:', message);
     }
 
     // Fermer modale
@@ -563,6 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           // Supprimer
           pageItem.querySelector('.delete-page').addEventListener('click', () => {
+            console.log(`Delete page ${index + 1} triggered`);
             showModal(`Supprimer la page ${index + 1} ?`, true);
             modalConfirm.onclick = () => {
               pages.splice(index, 1);
