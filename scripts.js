@@ -317,32 +317,44 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'in',
-        format: pageSizeSelect.value,
-      });
       const sizes = {
-        a4: [8.27, 11.69],
+        a4: [8.27, 11.69], // Portrait: width x height
         a5: [5.83, 8.27],
         '6x9': [6, 9],
         '8.5x11': [8.5, 11],
       };
-      const [width, height] = sizes[pageSizeSelect.value] || sizes['a4'];
-      const margin = 0.5; // Marge en pouces
-
-      // Mapper les polices pour compatibilité jsPDF
       const fontMap = {
         Roboto: 'Helvetica',
         Arial: 'Helvetica',
         'Times New Roman': 'Times',
       };
 
-      pages.forEach((page, index) => {
-        if (index > 0) doc.addPage();
-        doc.setFillColor(bgColorInput.value);
-        doc.rect(0, 0, width, height, 'F');
+      const doc = new jsPDF({
+        orientation: 'portrait', // Orientation par défaut
+        unit: 'in',
+        format: pageSizeSelect.value,
+      });
 
+      pages.forEach((page, index) => {
+        // Définir l’orientation par page
+        const orientation = page.template === 'landscape-text' ? 'landscape' : 'portrait';
+        if (index > 0) {
+          doc.addPage(pageSizeSelect.value, orientation);
+        } else if (page.template === 'landscape-text') {
+          // Réinitialiser la première page si landscape-text
+          doc.internal.pageSize = new jsPDF({
+            orientation: 'landscape',
+            unit: 'in',
+            format: pageSizeSelect.value,
+          }).internal.pageSize;
+        }
+
+        let { width, height } = doc.internal.pageSize;
+        if (page.template === 'landscape-text') {
+          // Inverser width/height pour paysage (ex. A4: 11.69x8.27)
+          [width, height] = [height, width];
+        }
+        const margin = 0.5; // Marge en pouces
         let imgWidth, imgHeight, imgX, imgY, textY;
 
         if (page.template === 'full-page') {
@@ -357,15 +369,35 @@ document.addEventListener('DOMContentLoaded', () => {
           imgY = margin;
           textY = imgHeight + margin + 0.5; // Texte en bas
         } else if (page.template === 'landscape-text') {
-          imgWidth = width - 2 * margin;
-          imgHeight = height * 0.6; // 60% pour l'image
-          imgX = margin;
-          imgY = margin; // Image en haut
-          textY = imgHeight + margin + 0.5; // Texte en bas
+          // Calculer les dimensions avec le ratio de l’image
+          const img = new Image();
+          img.src = page.image;
+          const imgRatio = img.naturalWidth / img.naturalHeight || 1;
+          imgHeight = height * 0.6; // 60% pour l’image
+          imgWidth = imgHeight * imgRatio;
+          // Limiter à la largeur de la page (moins marges)
+          if (imgWidth > width - 2 * margin) {
+            imgWidth = width - 2 * margin;
+            imgHeight = imgWidth / imgRatio;
+          }
+          imgX = (width - imgWidth) / 2; // Centrer horizontalement
+          imgY = margin;
+          textY = imgY + imgHeight + 0.5; // Texte en bas
         }
 
-        doc.addImage(page.image, 'JPEG', imgX, imgY, imgWidth, imgHeight, undefined, 'FAST');
+        // Fond de page
+        doc.setFillColor(bgColorInput.value);
+        doc.rect(0, 0, width, height, 'F');
 
+        // Ajout de l’image
+        try {
+          doc.addImage(page.image, 'JPEG', imgX, imgY, imgWidth, imgHeight, undefined, 'FAST');
+        } catch (error) {
+          console.error('addImage error:', error);
+          showToast('error', `Erreur lors de l’ajout de l’image page ${index + 1}.`);
+        }
+
+        // Ajout du texte
         if (page.template !== 'full-page' && page.prompt) {
           const selectedFont = fontSelect.value;
           const pdfFont = fontMap[selectedFont] || 'Helvetica';
@@ -380,6 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       });
+
       const fileName = fileNameInput.value || 'livre_sans_titre';
       doc.save(`${fileName}.pdf`);
       showToast('success', 'PDF exporté !');
@@ -545,11 +578,11 @@ document.addEventListener('DOMContentLoaded', () => {
           pageItem.setAttribute('draggable', 'true');
           pageItem.dataset.index = index;
           pageItem.innerHTML = `
-                        <div class="page-number">Page ${index + 1}</div>
-                        <img src="${page.image}" alt="Page ${index + 1}">
-                        <button class="edit-page">Éditer</button>
-                        <button class="delete-page">Supprimer</button>
-                    `;
+            <div class="page-number">Page ${index + 1}</div>
+            <img src="${page.image}" alt="Page ${index + 1}">
+            <button class="edit-page">Éditer</button>
+            <button class="delete-page">Supprimer</button>
+          `;
           pageCarousel.appendChild(pageItem);
           console.log(`Page ${index + 1} ajoutée au carrousel`);
 
