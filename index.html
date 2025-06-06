@@ -30,7 +30,7 @@
             </div>
             <div class="config-field">
                 <label for="file-name">Nom du fichier export</label>
-                <input type="text" id="file-name" placeholder="mon-nouveau-livre-kdp" pattern="[a-zA-Z0-9_-]+" title="Lettres, chiffres, tirets ou underscores uniquement">
+                <input type="text" id="file-name" placeholder="mon-nouveau-livre-kdp" pattern="[a-zA-Z0-9_-]{1,}" title="Lettres, chiffres, tirets ou underscores uniquement">
             </div>
             <div class="config-field">
                 <label for="page-size">Taille de Page KDP</label>
@@ -52,6 +52,10 @@
                     <option value="Arial">Arial</option>
                     <option value="Times New Roman">Times New Roman</option>
                 </select>
+            </div>
+            <div class="config-field">
+                <label for="font-size">Taille de Police</label>
+                <input type="number" id="font-size" min="8" max="24" value="12">
             </div>
             <div class="config-field">
                 <label for="text-color">Couleur du Texte</label>
