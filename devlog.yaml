@@ -1,19 +1,19 @@
 devlog:
   - date: 2025-06-06
-    time: 16:34 PM CEST
-    summary: Mise à jour complète du devlog pour KDP Creator. Corrections pour la modale (fond grisé, tentative de centrage au milieu de la page). Demande d’amélioration pour l’export PDF (orientation paysage pour landscape-text). En attente de validation de la modale et préparation de la correction dans scripts.js.
+    time: 16:40 PM CEST
+    summary: Validation du devlog pour KDP Creator. Confirmation du problème dans l’export PDF : images au format paysage déformées (allongées en hauteur) dans le template landscape-text. Modale corrigée pour fond grisé et centrage (en attente de validation). Préparation de la correction dans scripts.js pour l’export PDF.
     application:
       description: |
-        KDP Creator est une application web conçue pour créer des livres au format Kindle Direct Publishing (KDP). Elle permet d’ajouter des pages avec images et texte, de configurer le livre (titre, taille de page, police, couleurs), et d’exporter en PDF ou JSON. L’interface inclut un mode sombre/clair, un carrousel de pages, des notifications (toasts), et une modale pour les confirmations. L’application est intuitive et responsive.
+        KDP Creator est une application web pour créer des livres au format Kindle Direct Publishing (KDP). Les utilisateurs ajoutent des pages avec images et texte, configurent le livre (titre, taille de page, police, couleurs), et exportent en PDF ou JSON. L’interface propose un mode sombre/clair, un carrousel de pages, des toasts, et une modale pour les confirmations. L’application est intuitive et responsive.
       technologies:
         - HTML5, CSS3, JavaScript (ES6+)
-        - jsPDF (version 2.5.1, inclus via CDN <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>)
+        - jsPDF (version 2.5.1, CDN <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>)
         - LocalStorage pour persistance
         - Drag-and-drop API pour réorganisation des pages
       setup:
         - Fichiers : index.html, styles.css, scripts.js
         - Inclure jsPDF dans index.html
-        - Lancer via serveur local (ex. Live Server, python -m http.server)
+        - Lancer via serveur local (ex. : Live Server, python -m http.server)
         - Testé sur Chrome (v126), Firefox (v127)
     features:
       - Mode sombre/clair : Interrupteur (.theme-switch), persistance via localStorage, sombre par défaut.
@@ -27,10 +27,10 @@ devlog:
         - Titre (#book-title), nom de fichier (#file-name, regex /^[a-zA-Z0-9_-]+$/).
         - Taille de page (#page-size : A4, A5, 6x9, 8.5x11).
         - Police (#font : Roboto, Arial, Times New Roman), taille (#font-size : 8-24), couleurs (#text-color, #bg-color).
-      - Export PDF : Via jsPDF, mappage polices (Roboto/Arial → Helvetica, Times New Roman → Times).
+      - Export PDF : Via jsPDF, mappage polices (Roboto/Arial / Helvetica, Times New Roman / Times).
       - Sauvegarde/chargement JSON : Export (#save-project), import (#load-project).
       - Toasts : Succès, avertissement, erreur, info (ex. DPI < 300, police non disponible), file d’attente (3s/toast).
-      - Modale : Confirmation pour effacer projet (#clear-project) ou supprimer page (.delete-page), centrée (en cours de correction).
+      - Modale : Confirmation pour effacer projet (#clear-project) ou supprimer page (.delete-page), centrée (en test).
       - Validation : Nom de fichier, taille de police, contraste WCAG (ratio ≥ 4.5).
       - DPI : Avertissement si DPI < 300 (calcul : dpiX = img.width / widthInches).
     interface:
@@ -39,9 +39,9 @@ devlog:
         - Gauche : .panel (configuration : #book-title, #file-name, #page-size, #font, etc.).
         - Centre : .center-panel (ajout de page : .add-page-section, carrousel : .carousel-section).
         - Droite : .panel (options supplémentaires, non détaillées).
-        Barre de titre (.title-bar) : Nom de l’app, interrupteur de thème (.theme-switch).
+        - Barre de titre (.title-bar) : Nom app, interrupteur de thème (.theme-switch).
         Toasts (.toast) : Bas droite, z-index 1600, box-shadow.
-        Modale (.modal) : Centrée (en cours), fond grisé (rgba(0, 0, 0, 0.7)).
+        Modale (.modal) : Fond grisé (rgba(0, 0, 0, 0.7)), centrage en test.
       responsive:
         - <1024px : Grille en colonnes (.main-container), panneaux empilés.
         - <768px : Carrousel vertical (.carousel), modale ajustée (.modal-content : width 95%).
@@ -59,21 +59,21 @@ devlog:
       - Toasts : Roboto (“Helvetica utilisé”), DPI (< 300), “Image chargée” séquentiels (toastQueue).
       - Modale : Absente au chargement, fond grisé (rgba(0, 0, 0, 0.7), 100vw, 100vh).
       - DOM : <input id="font-size"> ajouté dans index.html.
-      - Export PDF : Templates full-page, portrait-text, landscape-text corrigés (sauf orientation paysage).
-      - Modale centrage : Tentative avec suppression de margin: auto, ajout de position: relative (en test).
+      - Export PDF : Templates full-page, portrait-text corrigés, landscape-text (déformation image signalée).
+      - Modale centrage : Suppression de margin: auto, ajout de position: relative (styles.css, en test).
       - Toast : Corrigé typo dans .toast-error (background-color: var(--toast-error-bg)).
     improvements:
       - Modale : Fond grisé couvrant l’écran (styles.css).
       - Modale : Centrage au milieu de la page (en test).
-      - Export PDF : Orientation paysage pour landscape-text (à implémenter dans scripts.js).
+      - Export PDF : Orientation paysage pour landscape-text, correction de la déformation de l’image (à implémenter).
     pending:
       - Validation du centrage de la modale (.modal-content au milieu de la page).
-      - Correction de l’export PDF pour landscape-text (orientation paysage dans jsPDF).
+      - Correction de l’export PDF pour landscape-text (orientation paysage, proportions image correctes).
       - Tests responsivité approfondis sur mobile (modale, carrousel).
       - Optimisation performance export PDF (multi-pages).
     next_steps:
-      - Valider le centrage de la modale après tests.
-      - Corriger scripts.js pour export PDF (landscape-text en orientation paysage).
+      - Valider le centrage de la modale (tests utilisateur).
+      - Corriger scripts.js pour export PDF (landscape-text : orientation paysage, image non déformée).
       - Tester modale et export PDF.
       - Mettre à jour devlog.yaml avec résultats.
     console_logs:
