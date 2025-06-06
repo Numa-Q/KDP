@@ -81,3 +81,36 @@ devlog:
       - "Toast displayed: <type>..." : Toast affiché.
       - "PDF exported: <fileName>" : PDF généré.
       - "Font mapping: { selectedFont, pdfFont }" : Mappage police.
+
+  - date: 2025-06-06
+      summary: Validation du devlog.yaml et correction de la modale avec fond grisé. Demande d’amélioration pour l’export PDF : image en orientation paysage pour le template landscape-text. Tests en cours pour la modale, préparation de l’export PDF.
+      fixes:
+        - Modale : Fond grisé (rgba(0, 0, 0, 0.7)) couvrant 100 % de l’écran (styles.css : width: 100vw, height: 100vh).
+      improvements:
+        - Export PDF : Template landscape-text doit utiliser orientation paysage dans jsPDF, avec image correctement affichée.
+      pending:
+        - Validation de la modale (fond grisé, centrage, fonctionnement).
+        - Correction de l’export PDF pour landscape-text (orientation paysage).
+        - Tests responsivité mobile.
+        - Optimisation performance PDF.
+      next_steps:
+        - Tester la modale avec fond grisé.
+        - Corriger l’export PDF dans scripts.js.
+        - Mettre à jour devlog.yaml avec résultats.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
