@@ -1,0 +1,83 @@
+devlog:
+  - date: 2025-06-06
+    summary: Développement de KDP Creator, une application web pour créer des livres au format Kindle Direct Publishing (KDP). Corrections pour le mode sombre, les toasts, la modale, et validation des fonctionnalités. Demande d’un fond grisé pour la modale et planification de l’export PDF. Devlog conçu pour permettre une reprise en cas de crash.
+    application:
+      description: |
+        KDP Creator est une application web permettant de créer des livres pour KDP. Les utilisateurs peuvent ajouter des pages avec images et texte, configurer le livre (titre, taille de page, police, couleurs), et exporter en PDF ou JSON. L’interface inclut un mode sombre/clair, un carrousel de pages, des toasts, et une modale pour les confirmations. L’application est conçue pour être intuitive et responsive.
+      technologies:
+        - HTML5, CSS3, JavaScript (ES6+)
+        - jsPDF (version 2.x.x, inclus via CDN ou fichier local)
+        - LocalStorage pour persistance
+        - Drag-and-drop API pour réorganisation des pages
+      setup:
+        - Cloner les fichiers : index.html, styles.css, scripts.js
+        - Inclure jsPDF via <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> dans index.html
+        - Lancer via serveur local (ex. Live Server VSCode, python -m http.server)
+        - Testé sur Chrome (v126) et Firefox (v127)
+    features:
+      - Mode sombre/clair : Interrupteur (#theme-toggle), persistance via localStorage, sombre par défaut.
+      - Gestion des pages : Ajout, édition, suppression, réorganisation via carrousel (#page-carousel) avec drag-and-drop.
+      - Chargement d’images : Drag-and-drop (#drop-zone) ou sélection (#image-upload), prévisualisation (#preview-zone).
+      - Templates de page :
+        - full-page : Image couvre toute la page (ex. 8.27x11.69 pour A4).
+        - portrait-text : Image en haut (70 %, ex. 7.27x8.18 pour A4), texte en bas (30 %, marge 0.5 pouce).
+        - landscape-text : Image en haut (60 %, ex. 7.27x7.01 pour A4), texte en bas (40 %, marge 0.5 pouce).
+      - Configuration :
+        - Titre (#book-title), nom de fichier (#file-name, regex /^[a-zA-Z0-9_-]+$/).
+        - Taille de page (#page-size : A4, A5, 6x9, 8.5x11).
+        - Police (#font : Roboto, Arial, Times New Roman), taille (#font-size : 8-24), couleurs (#text-color, #bg-color).
+      - Export PDF : Via jsPDF, mappage polices (Roboto/Arial → Helvetica, Times New Roman → Times).
+      - Sauvegarde/chargement JSON : Export (#save-project), import (#load-project).
+      - Toasts : Succès, avertissement, erreur, info (ex. DPI < 300, police non disponible), file d’attente (3s/toast).
+      - Modale : Confirmation pour effacer projet (#clear-project) ou supprimer page, centrée.
+      - Validation : Nom de fichier, taille de police, contraste WCAG (ratio ≥ 4.5).
+      - DPI : Avertissement si DPI < 300 (calcul : dpiX = img.width / widthInches).
+    interface:
+      description: |
+        Interface en grille CSS (3 colonnes : 25%-50%-25%) :
+        - Gauche : #config-panel (titre, nom fichier, taille page, police, couleurs).
+        - Centre : #add-page-section (drag-and-drop, prévisualisation, carrousel).
+        - Droite : Options supplémentaires (non détaillées).
+        Barre de titre (.title-bar) : Nom app, interrupteur thème.
+        Toasts (.toast) : Bas droite, z-index 1600, box-shadow.
+        Modale (.modal) : Centrée, fond à améliorer (grisé).
+      responsive:
+        - <1024px : Panneaux empilés verticalement.
+        - <768px : Carrousel vertical, tailles ajustées.
+    decisions:
+      - Mode sombre forcé (localStorage = 'dark') pour lisibilité.
+      - File d’attente toasts (toastQueue) pour séquence claire.
+      - Mappage polices jsPDF (Roboto → Helvetica) avec toast info.
+      - Modale cachée au chargement (modal.style.display = 'none').
+      - Fond grisé pour modale (rgba(0, 0, 0, 0.7)) pour performance mobile.
+      - Templates PDF : full-page sans marges, portrait-text (70/30), landscape-text (60/40).
+      - DPI calculé via image/page (ex. A4 : 8.27 pouces).
+    fixes:
+      - Mode sombre : Forcé par défaut (#2E3440, #FFFFFF).
+      - Toasts : Roboto (“Helvetica utilisé”), DPI (< 300), “Image chargée” séquentiels.
+      - Modale : Absente au chargement, centrée (styles.css : flex).
+      - DOM : `<input id="font-size">` ajouté dans index.html.
+      - Export PDF : full-page sans marges, portrait-text/landscape-text corrigés.
+    improvements:
+      - Fond grisé pour modale : Couvrir 100 % écran (rgba(0, 0, 0, 0.7)).
+      - Export PDF : À préciser (ex. pourcentages, marges, prévisualisation).
+    pending:
+      - Fondrier modale (styles.css : width: 100vw, height: 100vh).
+      - Validation modale après fond grisé.
+      - Précisions pour export PDF.
+      - Tests responsivité mobile.
+      - Optimisation performance PDF (multi-pages).
+    next_steps:
+      - Valider devlog.yaml.
+      - Corriger modale (styles.css).
+      - Définir et améliorer export PDF.
+      - Finaliser tests et documenter.
+    console_logs:
+      - "Initializing KDP Creator..." : Initialisation.
+      - "Initialisation terminée" : Fin init.
+      - "Modal initialized: hidden" : Modale cachée.
+      - "showModal called: { message, showConfirm }" : Modale déclenchée.
+      - "Toast queued: <type> - <message>" : Toast ajouté.
+      - "Toast displayed: <type>..." : Toast affiché.
+      - "PDF exported: <fileName>" : PDF généré.
+      - "Font mapping: { selectedFont, pdfFont }" : Mappage police.
