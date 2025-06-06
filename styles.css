@@ -369,12 +369,12 @@ button:disabled {
 .modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centrage précis */
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 2000;
+    display: flex; /* Flexbox explicite pour centrage */
     align-items: center;
     justify-content: center;
 }
@@ -387,6 +387,8 @@ button:disabled {
     max-width: 500px;
     width: 90%;
     text-align: center;
+    margin: auto; /* Centrage supplémentaire */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre pour visibilité */
 }
 
 .modal-buttons {
@@ -412,9 +414,10 @@ button:disabled {
     font-size: 14px;
     opacity: 0;
     transform: translateY(20px);
-    z-index: 1500;
+    z-index: 1600; /* Augmenté pour visibilité */
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
     display: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Ombre pour contraste */
 }
 
 .toast.active {
@@ -432,7 +435,7 @@ button:disabled {
 }
 
 .toast-error {
-    background-color: var(--toast-error-bg);
+    background-color: --toast-error-bg);
 }
 
 .toast-info {
@@ -464,6 +467,13 @@ button:disabled {
         right: 5%;
         bottom: 10px;
     }
+
+    /* Garantir centrage modale sur petits écrans */
+    .modal {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
 }
 
 @media (max-width: 768px) {
@@ -486,5 +496,11 @@ button:disabled {
 
     .button-group {
         flex-direction: column;
+    }
+
+    /* Ajuster modale pour petits écrans */
+    .modal-content {
+        width: 95%;
+        max-width: 400px;
     }
 }
