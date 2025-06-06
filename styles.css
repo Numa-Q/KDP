@@ -372,7 +372,8 @@ button:disabled {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.7); /* Fond grisé plus sombre */
+    min-height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -387,8 +388,8 @@ button:disabled {
     max-width: 500px;
     width: 90%;
     text-align: center;
-    margin: auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
 
 .modal-buttons {
